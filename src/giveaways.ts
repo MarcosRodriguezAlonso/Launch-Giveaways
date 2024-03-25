@@ -17,3 +17,18 @@ export const loginUser = (email: string, password: string): void => {
     process.exit();
   }
 };
+
+export const createGiveaway = (): void => {
+  const NewGiveaway = askUserNewGiveawayData();
+
+  const NewGiveawayAdjustedType = {
+    name: NewGiveaway.giveawayName,
+    socialNetwork: NewGiveaway.giveawaySocialNetwork,
+    participants: [],
+  };
+
+  programData.giveaways.push(NewGiveawayAdjustedType);
+  saveData();
+
+  console.log("Nuevo sorteo creado");
+};

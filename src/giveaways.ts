@@ -32,3 +32,11 @@ export const createGiveaway = (): void => {
 
   console.log("Nuevo sorteo creado");
 };
+
+export const listGiveaways = (): void => {
+  const giveaways = programData.giveaways;
+
+  if (giveaways.length === 0) {
+    console.log("No hay sorteos disponibles.");
+  }
+};

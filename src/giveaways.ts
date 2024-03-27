@@ -33,10 +33,17 @@ export const createGiveaway = (): void => {
   console.log("Nuevo sorteo creado");
 };
 
-export const listGiveaways = (): void => {
+export const listGiveaways = () => {
   const giveaways = programData.giveaways;
 
   if (giveaways.length === 0) {
-    console.log("No hay sorteos disponibles.");
+    console.log("No hay sorteos disponibles");
+    return;
   }
+
+  console.log(`Éstos son los ${giveaways.length} sorteos disponibles:`);
+
+  giveaways.forEach((giveaway, index) => {
+    console.log(`${index + 1}. ${giveaway.name} en ${giveaway.socialNetwork}`);
+  });
 };

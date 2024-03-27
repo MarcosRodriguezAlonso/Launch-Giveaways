@@ -47,3 +47,13 @@ export const listGiveaways = () => {
     console.log(`${index + 1}. ${giveaway.name} en ${giveaway.socialNetwork}`);
   });
 };
+
+export const deleteGiveaway = (giveawayNumber: number): void => {
+  if (giveawayNumber < 1 || giveawayNumber > programData.giveaways.length) {
+    console.log("No existen sorteos en es posición");
+  }
+
+  programData.giveaways.splice(giveawayNumber - 1, giveawayNumber);
+
+  console.log("Sorteo eliminado con éxito");
+};

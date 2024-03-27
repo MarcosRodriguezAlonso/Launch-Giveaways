@@ -1,7 +1,8 @@
+import { userInfo } from "os";
 import { askUser } from "./askUser.js";
 import { programData, saveData } from "./storage.js";
 
-import { Giveaway } from "./types.js";
+import { Giveaway, User } from "./types.js";
 import { askUserNewGiveawayData } from "./ui.js";
 
 export const loginUser = (email: string, password: string): void => {
@@ -16,6 +17,8 @@ export const loginUser = (email: string, password: string): void => {
     console.log("Error, el usuario no existe");
     process.exit();
   }
+
+  saveData();
 };
 
 export const createGiveaway = (): void => {
@@ -48,12 +51,52 @@ export const listGiveaways = () => {
   });
 };
 
-export const deleteGiveaway = (giveawayNumber: number): void => {
-  if (giveawayNumber < 1 || giveawayNumber > programData.giveaways.length) {
+export const deleteGiveaway = (giveawayToDelete: number): void => {
+  if (giveawayToDelete < 1 || giveawayToDelete > programData.giveaways.length) {
     console.log("No existen sorteos en es posición");
   }
 
-  programData.giveaways.splice(giveawayNumber - 1, giveawayNumber);
-
+  programData.giveaways.splice(giveawayToDelete - 1, giveawayToDelete);
+  saveData();
   console.log("Sorteo eliminado con éxito");
+};
+
+export const enterGiveaway = (giveawayToJoin: number): void => {
+  if (giveawayToJoin < 1 || giveawayToJoin > programData.giveaways.length) {
+    console.log("El sorteo indicado no existe");
+    return;
+  }
+  const userEmail: User = {
+    name: "",
+    email: programData.userEmail,
+    password: "",
+    isAdmin: false,
+  };
+  programData.giveaways[giveawayToJoin - 1].participants.push(userEmail);
+  saveData();
+  console.log("Inscrito en el sorteo con éxito");
+};
+
+export const listUserGiveaways = (): void => {
+  const userEmail = programData.userEmail;
+  const userGiveaways = programData.giveaways.filter((giveaway) =>
+    giveaway.participants.some((participant) => participant.email === userEmail)
+  );
+
+  if (userGiveaways.length === 0) {
+    console.log("No estás registrado en ningún sorteo");
+  }
+
+  let sorteosStringSwitch = "sorteos";
+
+  if (userGiveaways.length === 1) {
+    sorteosStringSwitch = "sorteo";
+  }
+
+  console.log(
+    `Estás inscrito en ${userGiveaways.length} ${sorteosStringSwitch}:`
+  );
+  userGiveaways.forEach((giveaway, index) => {
+    console.log(`${index + 1}- ${giveaway.name} en ${giveaway.socialNetwork}`);
+  });
 };

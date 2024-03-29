@@ -22,21 +22,32 @@ export const loginUser = (email: string, password: string): void => {
 };
 
 export const createGiveaway = (): void => {
-  const NewGiveaway = askUserNewGiveawayData();
+  const newGiveaway = askUserNewGiveawayData();
 
-  const NewGiveawayAdjustedType = {
-    name: NewGiveaway.giveawayName,
-    socialNetwork: NewGiveaway.giveawaySocialNetwork,
+  const newGiveawayAdjustedType = {
+    name: newGiveaway.giveawayName,
+    socialNetwork: newGiveaway.giveawaySocialNetwork,
     participants: [],
   };
 
-  programData.giveaways.push(NewGiveawayAdjustedType);
+  const existingGiveaway = programData.giveaways.find(
+    (giveaway) =>
+      giveaway.name === newGiveaway.giveawayName &&
+      giveaway.socialNetwork === newGiveaway.giveawaySocialNetwork
+  );
+
+  if (existingGiveaway) {
+    console.log("Ese sorteo ya existe");
+    return;
+  }
+
+  programData.giveaways.push(newGiveawayAdjustedType);
   saveData();
 
   console.log("Nuevo sorteo creado");
 };
 
-export const listGiveaways = () => {
+export const listGiveaways = (): void => {
   const giveaways = programData.giveaways;
 
   if (giveaways.length === 0) {
@@ -53,27 +64,42 @@ export const listGiveaways = () => {
 
 export const deleteGiveaway = (giveawayToDelete: number): void => {
   if (giveawayToDelete < 1 || giveawayToDelete > programData.giveaways.length) {
-    console.log("No existen sorteos en es posición");
+    console.log("No existen sorteos en esa posición");
+    return;
   }
 
-  programData.giveaways.splice(giveawayToDelete - 1, giveawayToDelete);
-  saveData();
-  console.log("Sorteo eliminado con éxito");
+  if (programData.giveaways.splice(giveawayToDelete - 1, giveawayToDelete)) {
+    saveData();
+    console.log("Sorteo eliminado con éxito");
+  }
 };
 
-export const enterGiveaway = (giveawayToJoin: number): void => {
-  if (giveawayToJoin < 1 || giveawayToJoin > programData.giveaways.length) {
+export const enterGiveaway = (giveawayToEnter: number): void => {
+  const giveaway = programData.giveaways[giveawayToEnter - 1];
+
+  if (!giveaway) {
     console.log("El sorteo indicado no existe");
     return;
   }
-  const userEmail: User = {
+
+  const alreadyEntered = giveaway.participants.some(
+    (participant) => participant.email === programData.userEmail
+  );
+
+  if (alreadyEntered) {
+    console.log("Ya estás incrito en ese sorteo");
+    return;
+  }
+
+  giveaway.participants.push({
     name: "",
     email: programData.userEmail,
     password: "",
     isAdmin: false,
-  };
-  programData.giveaways[giveawayToJoin - 1].participants.push(userEmail);
+  });
+
   saveData();
+
   console.log("Inscrito en el sorteo con éxito");
 };
 
@@ -85,16 +111,13 @@ export const listUserGiveaways = (): void => {
 
   if (userGiveaways.length === 0) {
     console.log("No estás registrado en ningún sorteo");
-  }
-
-  let sorteosStringSwitch = "sorteos";
-
-  if (userGiveaways.length === 1) {
-    sorteosStringSwitch = "sorteo";
+    return;
   }
 
   console.log(
-    `Estás inscrito en ${userGiveaways.length} ${sorteosStringSwitch}:`
+    `Estás inscrito en ${userGiveaways.length} ${
+      userGiveaways.length === 1 ? "sorteo" : "sorteos"
+    }:`
   );
   userGiveaways.forEach((giveaway, index) => {
     console.log(`${index + 1}- ${giveaway.name} en ${giveaway.socialNetwork}`);

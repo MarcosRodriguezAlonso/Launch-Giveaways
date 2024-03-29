@@ -82,21 +82,24 @@ export const enterGiveaway = (giveawayToEnter: number): void => {
     return;
   }
 
-  const alreadyEntered = giveaway.participants.some(
+  const hasAlreadyEntered = giveaway.participants.some(
     (participant) => participant.email === programData.userEmail
   );
 
-  if (alreadyEntered) {
+  if (hasAlreadyEntered) {
     console.log("Ya estás incrito en ese sorteo");
     return;
   }
 
-  giveaway.participants.push({
-    name: "",
-    email: programData.userEmail,
-    password: "",
-    isAdmin: false,
-  });
+  const user = programData.users.find(
+    (user) => user.email === programData.userEmail
+  );
+
+  if (typeof user === "undefined") {
+    return;
+  }
+
+  giveaway.participants.push(user);
 
   saveData();
 
